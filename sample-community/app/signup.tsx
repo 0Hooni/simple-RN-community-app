@@ -2,7 +2,6 @@ import styled from 'styled-components/native';
 import { TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { TextField, Button } from '../src/components';
 import { typography } from '../src/styles';
-import { router } from 'expo-router';
 
 const Title = styled.Text`
   font-size: ${typography.title1.fontSize}px;
@@ -30,12 +29,17 @@ const ButtonContainer = styled.View`
   gap: 20px;
 `;
 
-export default function Index() {
+export default function Signup() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <Container>
-        <Title>로그인</Title>
+        <Title>회원가입</Title>
         <TextFieldContainer>
+          <TextField
+            title="닉네임"
+            placeholder="닉네임을 입력해주세요."
+            keyboardType="default"
+          />
           <TextField
             title="이메일"
             placeholder="이메일을 입력해주세요."
@@ -48,14 +52,7 @@ export default function Index() {
           />
         </TextFieldContainer>
         <ButtonContainer>
-          <Button text="로그인" backgroundColor="blue" onPress={() => {}} />
-          <Button
-            text="회원가입"
-            backgroundColor="gray"
-            onPress={() => {
-              router.push('/signup');
-            }}
-          />
+          <Button text="가입하기" backgroundColor="blue" onPress={() => {}} />
         </ButtonContainer>
       </Container>
     </TouchableWithoutFeedback>
