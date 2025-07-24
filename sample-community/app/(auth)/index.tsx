@@ -1,10 +1,10 @@
 import styled from 'styled-components/native';
 import { TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
-import { TextField, Button } from '../src/components';
-import { typography } from '../src/styles';
-import { useState } from 'react';
+import { TextField, Button } from '../../src/components';
+import { typography } from '../../src/styles';
 import { router } from 'expo-router';
-import { supabase } from '../src/lib/supabase';
+import { useState } from 'react';
+import { supabase } from '../../src/lib/supabase';
 
 const Title = styled.Text`
   font-size: ${typography.title1.fontSize}px;
@@ -33,50 +33,32 @@ const ButtonContainer = styled.View`
   padding-top: 100px;
 `;
 
-export default function Signup() {
-  const [nickname, setNickname] = useState('');
+export default function Index() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSignup = async () => {
-    if (!nickname.trim() || !email.trim() || !password.trim()) {
-      Alert.alert('모든 필드를 입력해주세요.');
-      return;
-    }
-
-    if (password.length < 8) {
-      Alert.alert('비밀번호는 8자 이상이어야 합니다.');
+  const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      Alert.alert('이메일과 비밀번호를 입력해주세요.');
       return;
     }
 
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password: password.trim(),
-        options: {
-          data: {
-            nickname: nickname.trim(),
-          },
-        },
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
 
       if (error) {
-        Alert.alert('회원가입 실패', error.message);
+        Alert.alert('로그인 실패', error.message);
       } else {
-        Alert.alert('회원가입 성공', '로그인 화면으로 이동합니다.', [
-          {
-            text: '확인',
-            onPress: () => {
-              router.back();
-            },
-          },
-        ]);
+        router.replace('/(home)');
       }
     } catch (error) {
-      Alert.alert('회원가입 실패', '예기치 못한 오류가 발생했습니다.');
+      Alert.alert('로그인 실패', '알 수 없는 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -85,15 +67,8 @@ export default function Signup() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <Container>
-        <Title>회원가입</Title>
+        <Title>로그인</Title>
         <TextFieldContainer>
-          <TextField
-            title="닉네임"
-            placeholder="닉네임을 입력해주세요."
-            keyboardType="default"
-            value={nickname}
-            onChangeText={setNickname}
-          />
           <TextField
             title="이메일"
             placeholder="이메일을 입력해주세요."
@@ -111,10 +86,17 @@ export default function Signup() {
         </TextFieldContainer>
         <ButtonContainer>
           <Button
-            text="가입하기"
+            text={loading ? '로그인 중...' : '로그인'}
             backgroundColor="blue"
-            onPress={handleSignup}
+            onPress={handleLogin}
             disabled={loading}
+          />
+          <Button
+            text="회원가입"
+            backgroundColor="gray"
+            onPress={() => {
+              router.push('/signup');
+            }}
           />
         </ButtonContainer>
       </Container>
