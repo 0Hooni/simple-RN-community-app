@@ -3,6 +3,7 @@ import { TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { TextField, Button } from '../src/components';
 import { typography } from '../src/styles';
 import { router } from 'expo-router';
+import { useState } from 'react';
 
 const Title = styled.Text`
   font-size: ${typography.title1.fontSize}px;
@@ -31,6 +32,9 @@ const ButtonContainer = styled.View`
 `;
 
 export default function Index() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <Container>
@@ -40,11 +44,15 @@ export default function Index() {
             title="이메일"
             placeholder="이메일을 입력해주세요."
             keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
           />
           <TextField
             title="비밀번호"
             placeholder="비밀번호를 입력해주세요."
             keyboardType="visible-password"
+            value={password}
+            onChangeText={setPassword}
           />
         </TextFieldContainer>
         <ButtonContainer>

@@ -20,13 +20,19 @@ export const Button = ({
   text,
   backgroundColor,
   onPress,
+  disabled,
 }: {
   text: string;
   backgroundColor: string;
   onPress: () => void;
+  disabled?: boolean;
 }) => {
   return (
-    <TouchableOpacity style={{ backgroundColor }} onPress={onPress}>
+    <TouchableOpacity
+      style={{ backgroundColor }}
+      onPress={onPress}
+      disabled={disabled}
+    >
       <Text>{text}</Text>
     </TouchableOpacity>
   );

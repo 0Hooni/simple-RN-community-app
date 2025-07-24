@@ -1,5 +1,5 @@
-import styled from "styled-components/native";
-import { typography } from "../styles";
+import styled from 'styled-components/native';
+import { typography } from '../styles';
 
 const Container = styled.View`
   flex-direction: row;
@@ -15,7 +15,7 @@ const Text = styled.Text`
   font-size: ${typography.body.fontSize}px;
   font-weight: ${typography.body.fontWeight};
   line-height: ${typography.body.lineHeight}px;
-`
+`;
 
 const Divider = styled.View`
   width: 2px;
@@ -30,32 +30,35 @@ const TextInput = styled.TextInput.attrs({
   font-size: ${typography.body.fontSize}px;
   font-weight: ${typography.body.fontWeight};
   line-height: ${typography.body.lineHeight}px;
-`
+`;
 
-export const TextField = ({ 
-  title, 
-  placeholder, 
-  keyboardType = "default" 
-}: { 
-  title: string, 
-  placeholder: string, 
-  keyboardType?: "default" | "email-address" | "visible-password"
+export const TextField = ({
+  title,
+  placeholder,
+  keyboardType = 'default',
+  value,
+  onChangeText,
+}: {
+  title: string;
+  placeholder: string;
+  keyboardType?: 'default' | 'email-address' | 'visible-password';
+  value: string;
+  onChangeText: (text: string) => void;
 }) => {
   return (
     <Container>
       <Text>{title}</Text>
       <Divider />
-      <TextInput 
+      <TextInput
         placeholder={placeholder}
         keyboardType={keyboardType}
-        secureTextEntry={keyboardType === "visible-password"}
+        secureTextEntry={keyboardType === 'visible-password'}
         autoCapitalize="none"
         autoComplete="off"
         autoCorrect={false}
+        value={value}
+        onChangeText={onChangeText}
       />
     </Container>
-  )
-}
-
-
-
+  );
+};
