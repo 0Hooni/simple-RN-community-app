@@ -16,7 +16,7 @@ const Container = styled.View`
   justify-content: center;
   align-items: center;
   background-color: white;
-  gap: 140px;
+  gap: 100px;
 `;
 
 const TextFieldContainer = styled.View`
@@ -29,6 +29,7 @@ const TextFieldContainer = styled.View`
 const ButtonContainer = styled.View`
   flex-direction: column;
   gap: 20px;
+  padding-top: 100px;
 `;
 
 export default function Index() {
