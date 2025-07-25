@@ -17,4 +17,9 @@ export const typography = {
     fontWeight: 'normal' as const,
     lineHeight: 22,
   },
+  callout: {
+    fontSize: 16,
+    fontWeight: 'normal' as const,
+    lineHeight: 21,
+  },
 } as const;
