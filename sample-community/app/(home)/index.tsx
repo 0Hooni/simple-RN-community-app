@@ -1,15 +1,16 @@
-import { useEffect, useState } from 'react';
-import styled from 'styled-components/native';
-import { PostListItem } from '../../src/lib/types';
-import { fetchPosts } from '@/src/lib/api';
+import React, { useEffect, useState } from 'react';
+import { RefreshControl } from 'react-native';
 import { PostPreView } from '../../src/components/PostPreView';
+import { fetchPosts } from '../../src/lib/api';
+import { PostListItem } from '../../src/lib/types';
+import styled from 'styled-components/native';
 
 const Container = styled.ScrollView`
   flex: 1;
   background-color: white;
 `;
 
-const LodingText = styled.Text`
+const LoadingText = styled.Text`
   text-align: center;
   padding: 20px;
 `;
@@ -23,6 +24,7 @@ const ErrorText = styled.Text`
 export default function Home() {
   const [posts, setPosts] = useState<PostListItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -43,6 +45,20 @@ export default function Home() {
     }
   };
 
+  const onRefresh = async () => {
+    try {
+      setRefreshing(true);
+      setError(null);
+      const data = await fetchPosts();
+      setPosts(data);
+    } catch (err) {
+      setError('게시글을 불러오는데 실패했습니다.');
+      console.error(err);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('ko-KR');
@@ -51,21 +67,29 @@ export default function Home() {
   if (loading) {
     return (
       <Container>
-        <LodingText>게시글을 불러오는 중입니다...</LodingText>
+        <LoadingText>게시글을 불러오는 중...</LoadingText>
       </Container>
     );
   }
 
   if (error) {
     return (
-      <Container>
+      <Container
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <ErrorText>{error}</ErrorText>
       </Container>
     );
   }
 
   return (
-    <Container>
+    <Container
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       {posts.map((post) => (
         <PostPreView
           key={post.id}
@@ -73,6 +97,7 @@ export default function Home() {
           writer={post.profiles?.nickname || '익명'}
           timeStamp={formatDate(post.created_at)}
           onPress={() => {
+            // TODO: 게시글 상세 화면으로 이동
             console.log('게시글 클릭:', post.id);
           }}
         />
