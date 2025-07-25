@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import { Button, Post, TextField } from '@/src/components';
+import { Post, SmallButton, TextField } from '@/src/components';
 import { useEffect, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { PostDetail } from '@/src/lib/types';
@@ -15,6 +15,7 @@ import { Text } from 'react-native';
 const Container = styled.View`
   flex: 1;
   background-color: white;
+  padding-bottom: 16px;
 `;
 
 const ScrollContainer = styled.ScrollView`
@@ -29,6 +30,10 @@ const WriteCommentContainer = styled.View`
   align-items: center;
   gap: 4px;
   padding: 16px;
+`;
+
+const TextFieldWrapper = styled.View`
+  flex: 1;
 `;
 
 const LoadingContainer = styled.View`
@@ -98,7 +103,7 @@ export default function PostDetailPage() {
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
       <Container>
         <ScrollContainer>
@@ -110,14 +115,16 @@ export default function PostDetailPage() {
           />
         </ScrollContainer>
         <WriteCommentContainer>
-          <TextField
-            title="댓글"
-            placeholder="댓글을 입력해주세요."
-            value={comment}
-            onChangeText={setComment}
-          />
-          <Button
-            text="작성"
+          <TextFieldWrapper>
+            <TextField
+              title="댓글"
+              placeholder="댓글을 입력해주세요."
+              value={comment}
+              onChangeText={setComment}
+            />
+          </TextFieldWrapper>
+          <SmallButton
+            text="↑"
             onPress={handleWriteComment}
             backgroundColor="blue"
           />
