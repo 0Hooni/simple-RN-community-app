@@ -3,7 +3,7 @@ import { Post, SmallButton, TextField } from '@/src/components';
 import { useEffect, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { PostDetail } from '@/src/lib/types';
-import { fetchPostDetail } from '@/src/lib/api';
+import { fetchPostDetail, createComment } from '@/src/lib/api';
 import {
   ActivityIndicator,
   Alert,
@@ -84,6 +84,20 @@ export default function PostDetailPage() {
     if (!comment.trim()) {
       Alert.alert('댓글을 입력해주세요.');
       return;
+    }
+
+    if (!postId) return;
+
+    try {
+      await createComment({ post_id: postId, content: comment.trim() });
+
+      setComment('');
+
+      await loadPostDetail();
+
+      Alert.alert('성공', '댓글이 작성되었습니다.');
+    } catch (error) {
+      Alert.alert('실패', '댓글 작성에 실패했습니다.');
     }
   };
 
