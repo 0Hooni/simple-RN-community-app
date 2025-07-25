@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import { Post, SmallButton, TextField } from '@/src/components';
+import { Comment, Post, SmallButton, TextField } from '@/src/components';
 import { useEffect, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { PostDetail } from '@/src/lib/types';
@@ -11,9 +11,11 @@ import {
   Platform,
 } from 'react-native';
 import { Text } from 'react-native';
+import { typography } from '@/src/styles';
 
 const Container = styled.View`
   flex: 1;
+  gap: 16px;
   background-color: white;
   padding-bottom: 16px;
 `;
@@ -22,6 +24,23 @@ const ScrollContainer = styled.ScrollView`
   flex: 1;
   padding: 24px 16px;
   background-color: white;
+`;
+
+const ScrollContent = styled.View`
+  flex: 1;
+  gap: 16px;
+`;
+
+const Divider = styled.View`
+  width: 100%;
+  height: 2px;
+  background-color: gray;
+`;
+
+const CommentTitle = styled.Text`
+  font-size: ${typography.title3.fontSize}px;
+  font-weight: ${typography.title3.fontWeight};
+  line-height: ${typography.title3.lineHeight}px;
 `;
 
 const WriteCommentContainer = styled.View`
@@ -121,12 +140,21 @@ export default function PostDetailPage() {
     >
       <Container>
         <ScrollContainer>
-          <Post
-            title={post?.title || ''}
-            writer={post?.profiles?.nickname || ''}
-            timeStamp={formatDate(post?.created_at || '')}
-            content={post?.content || ''}
-          />
+          <ScrollContent>
+            <Post
+              title={post?.title || ''}
+              writer={post?.profiles?.nickname || ''}
+              timeStamp={formatDate(post?.created_at || '')}
+              content={post?.content || ''}
+            />
+            <Divider />
+            <CommentTitle>댓글</CommentTitle>
+            <Comment
+              author={'작성자'}
+              timestamp={'2025-07-25'}
+              content={'댓글 내용'}
+            />
+          </ScrollContent>
         </ScrollContainer>
         <WriteCommentContainer>
           <TextFieldWrapper>
