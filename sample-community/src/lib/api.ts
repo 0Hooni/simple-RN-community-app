@@ -29,12 +29,12 @@ export const fetchPosts = async (): Promise<PostListItem[]> => {
 
     if (error) throw error;
 
-    console.log('Raw data from Supabase:', JSON.stringify(data, null, 2));
-
     return (
       data?.map((post) => ({
         ...post,
-        profiles: post.profiles || null, // [0] 제거
+        profiles: Array.isArray(post.profiles)
+          ? post.profiles[0] || null
+          : post.profiles,
       })) || []
     );
   } catch (error) {
@@ -92,9 +92,22 @@ export const createPost = async (
   postData: CreatePostRequest,
 ): Promise<Post> => {
   try {
+    // 현재 로그인한 사용자 정보 가져오기
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error('로그인이 필요합니다.');
+    }
+
+    // author_id를 포함한 데이터로 게시글 작성
     const { data, error } = await supabase
       .from('posts')
-      .insert(postData)
+      .insert({
+        ...postData,
+        author_id: user.id,
+      })
       .select()
       .single();
 
