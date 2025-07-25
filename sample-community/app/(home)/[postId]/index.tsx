@@ -99,6 +99,16 @@ export default function PostDetailPage() {
     });
   };
 
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ko-KR', {
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
   const handleWriteComment = async () => {
     if (!comment.trim()) {
       Alert.alert('댓글을 입력해주세요.');
@@ -148,12 +158,25 @@ export default function PostDetailPage() {
               content={post?.content || ''}
             />
             <Divider />
-            <CommentTitle>댓글</CommentTitle>
-            <Comment
-              author={'작성자'}
-              timestamp={'2025-07-25'}
-              content={'댓글 내용'}
-            />
+            <CommentTitle>댓글 {post?.comments?.length || 0}개</CommentTitle>
+
+            {/* 실제 댓글 목록 렌더링 */}
+            {post?.comments && post.comments.length > 0 ? (
+              post.comments.map((comment) => (
+                <Comment
+                  key={comment.id}
+                  author={comment.profiles?.nickname || '익명'}
+                  timestamp={formatDateTime(comment.created_at)}
+                  content={comment.content}
+                />
+              ))
+            ) : (
+              <Text
+                style={{ textAlign: 'center', color: 'gray', marginTop: 20 }}
+              >
+                첫 번째 댓글을 작성해보세요!
+              </Text>
+            )}
           </ScrollContent>
         </ScrollContainer>
         <WriteCommentContainer>
