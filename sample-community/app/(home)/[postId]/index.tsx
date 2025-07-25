@@ -1,9 +1,11 @@
 import styled from 'styled-components/native';
 import { Post } from '../../../src/components/Post';
 import { useEffect, useState } from 'react';
-import { useLocalSearchParams, useNavigation } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { PostDetail } from '@/src/lib/types';
 import { fetchPostDetail } from '@/src/lib/api';
+import { ActivityIndicator } from 'react-native';
+import { Text } from 'react-native';
 
 const Container = styled.ScrollView`
   flex: 1;
@@ -14,7 +16,6 @@ const Container = styled.ScrollView`
 
 export default function PostDetailPage() {
   const { postId } = useLocalSearchParams<{ postId: string }>();
-  const navigation = useNavigation();
   const [post, setPost] = useState<PostDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,14 +23,6 @@ export default function PostDetailPage() {
   useEffect(() => {
     loadPostDetail();
   }, [postId]);
-
-  useEffect(() => {
-    if (post?.title) {
-      navigation.setOptions({
-        headerTitle: post.title,
-      });
-    }
-  }, [post?.title, navigation]);
 
   const loadPostDetail = async () => {
     if (!postId) return;
@@ -47,10 +40,6 @@ export default function PostDetailPage() {
     }
   };
 
-  useEffect(() => {
-    console.log(postId);
-  }, [postId]);
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('ko-KR', {
@@ -59,6 +48,18 @@ export default function PostDetailPage() {
       day: '2-digit',
     });
   };
+
+  if (loading) {
+    return (
+      <Container>
+        <ActivityIndicator size="large" color="black" />
+      </Container>
+    );
+  }
+
+  if (error) {
+    return <Text>{error}</Text>;
+  }
 
   return (
     <Container>
