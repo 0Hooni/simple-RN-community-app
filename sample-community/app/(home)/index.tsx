@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { RefreshControl } from 'react-native';
-import { PostPreView } from '../../src/components/PostPreView';
-import { fetchPosts } from '../../src/lib/api';
-import { PostListItem } from '../../src/lib/types';
+import { PostPreView } from '@/src/components';
+import { fetchPosts } from '@/src/lib/api';
+import { PostListItem } from '@/src/lib/types';
 import styled from 'styled-components/native';
 import { router } from 'expo-router';
 

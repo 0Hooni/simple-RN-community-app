@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import { Post } from '../../../src/components/Post';
+import { Post } from '@/src/components';
 import { useEffect, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { PostDetail } from '@/src/lib/types';
