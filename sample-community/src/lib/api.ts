@@ -151,9 +151,22 @@ export const createComment = async (
   commentData: CreateCommentRequest,
 ): Promise<CommentWithAuthor> => {
   try {
+    // 현재 로그인한 사용자 정보 가져오기
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error('로그인이 필요합니다.');
+    }
+
+    // author_id를 포함한 데이터로 댓글 작성
     const { data, error } = await supabase
       .from('comments')
-      .insert(commentData)
+      .insert({
+        ...commentData,
+        author_id: user.id,
+      })
       .select(
         `
         *,

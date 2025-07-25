@@ -1,17 +1,47 @@
 import styled from 'styled-components/native';
-import { Post } from '@/src/components';
+import { Post, SmallButton, TextField } from '@/src/components';
 import { useEffect, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { PostDetail } from '@/src/lib/types';
-import { fetchPostDetail } from '@/src/lib/api';
-import { ActivityIndicator } from 'react-native';
+import { fetchPostDetail, createComment } from '@/src/lib/api';
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { Text } from 'react-native';
 
-const Container = styled.ScrollView`
+const Container = styled.View`
+  flex: 1;
+  background-color: white;
+  padding-bottom: 16px;
+`;
+
+const ScrollContainer = styled.ScrollView`
   flex: 1;
   padding: 24px 16px;
   background-color: white;
-  gap: 16px;
+`;
+
+const WriteCommentContainer = styled.View`
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  padding: 16px;
+`;
+
+const TextFieldWrapper = styled.View`
+  flex: 1;
+`;
+
+const LoadingContainer = styled.View`
+  flex: 1;
+  padding: 24px 16px;
+  background-color: white;
+  justify-content: center;
+  align-items: center;
 `;
 
 export default function PostDetailPage() {
@@ -19,6 +49,7 @@ export default function PostDetailPage() {
   const [post, setPost] = useState<PostDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [comment, setComment] = useState('');
 
   useEffect(() => {
     loadPostDetail();
@@ -49,11 +80,32 @@ export default function PostDetailPage() {
     });
   };
 
+  const handleWriteComment = async () => {
+    if (!comment.trim()) {
+      Alert.alert('댓글을 입력해주세요.');
+      return;
+    }
+
+    if (!postId) return;
+
+    try {
+      await createComment({ post_id: postId, content: comment.trim() });
+
+      setComment('');
+
+      await loadPostDetail();
+
+      Alert.alert('성공', '댓글이 작성되었습니다.');
+    } catch (error) {
+      Alert.alert('실패', '댓글 작성에 실패했습니다.');
+    }
+  };
+
   if (loading) {
     return (
-      <Container>
+      <LoadingContainer>
         <ActivityIndicator size="large" color="black" />
-      </Container>
+      </LoadingContainer>
     );
   }
 
@@ -62,13 +114,36 @@ export default function PostDetailPage() {
   }
 
   return (
-    <Container>
-      <Post
-        title={post?.title || ''}
-        writer={post?.profiles?.nickname || ''}
-        timeStamp={formatDate(post?.created_at || '')}
-        content={post?.content || ''}
-      />
-    </Container>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+    >
+      <Container>
+        <ScrollContainer>
+          <Post
+            title={post?.title || ''}
+            writer={post?.profiles?.nickname || ''}
+            timeStamp={formatDate(post?.created_at || '')}
+            content={post?.content || ''}
+          />
+        </ScrollContainer>
+        <WriteCommentContainer>
+          <TextFieldWrapper>
+            <TextField
+              title="댓글"
+              placeholder="댓글을 입력해주세요."
+              value={comment}
+              onChangeText={setComment}
+            />
+          </TextFieldWrapper>
+          <SmallButton
+            text="↑"
+            onPress={handleWriteComment}
+            backgroundColor="blue"
+          />
+        </WriteCommentContainer>
+      </Container>
+    </KeyboardAvoidingView>
   );
 }
