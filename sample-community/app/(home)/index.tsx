@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { RefreshControl } from 'react-native';
-import { PostPreView } from '../../src/components/PostPreView';
-import { fetchPosts } from '../../src/lib/api';
-import { PostListItem } from '../../src/lib/types';
+import { PostPreView } from '@/src/components';
+import { fetchPosts } from '@/src/lib/api';
+import { PostListItem } from '@/src/lib/types';
 import styled from 'styled-components/native';
+import { router } from 'expo-router';
 
 const Container = styled.ScrollView`
   flex: 1;
@@ -97,8 +98,7 @@ export default function Home() {
           writer={post.profiles?.nickname || '익명'}
           timeStamp={formatDate(post.created_at)}
           onPress={() => {
-            // TODO: 게시글 상세 화면으로 이동
-            console.log('게시글 클릭:', post.id);
+            router.push(`/${post.id}`);
           }}
         />
       ))}

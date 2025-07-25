@@ -1,10 +1,10 @@
 import styled from 'styled-components/native';
 import { TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
-import { TextField, Button } from '../../src/components';
-import { typography } from '../../src/styles';
+import { TextField, Button } from '@/src/components';
+import { typography } from '@/src/styles';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { supabase } from '../../src/lib/supabase';
+import { supabase } from '@/src/lib/supabase';
 
 const Title = styled.Text`
   font-size: ${typography.title1.fontSize}px;

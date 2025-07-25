@@ -11,30 +11,32 @@ import {
 // 게시글 목록 조회 (최신순 정렬)
 export const fetchPosts = async (): Promise<PostListItem[]> => {
   try {
-    // 1. 게시글 목록 조회
-    const { data: posts, error: postsError } = await supabase
+    const { data, error } = await supabase
       .from('posts')
-      .select('id, title, author_id, created_at')
+      .select(
+        `
+        id,
+        title,
+        author_id,
+        created_at,
+        profiles:author_id (
+          id,
+          nickname
+        )
+      `,
+      )
       .order('created_at', { ascending: false });
 
-    if (postsError) throw postsError;
-    if (!posts || posts.length === 0) return [];
+    if (error) throw error;
 
-    // 2. 작성자 정보 조회
-    const authorIds = [...new Set(posts.map((post) => post.author_id))];
-    const { data: profiles, error: profilesError } = await supabase
-      .from('profiles')
-      .select('id, nickname')
-      .in('id', authorIds);
+    console.log('Raw data from Supabase:', JSON.stringify(data, null, 2));
 
-    if (profilesError) throw profilesError;
-
-    // 3. 데이터 결합
-    return posts.map((post) => ({
-      ...post,
-      profiles:
-        profiles?.find((profile) => profile.id === post.author_id) || null,
-    }));
+    return (
+      data?.map((post) => ({
+        ...post,
+        profiles: post.profiles || null, // [0] 제거
+      })) || []
+    );
   } catch (error) {
     console.error('게시글 목록 조회 실패:', error);
     throw error;
@@ -70,7 +72,15 @@ export const fetchPostDetail = async (postId: string): Promise<PostDetail> => {
     if (error) throw error;
     if (!data) throw new Error('게시글을 찾을 수 없습니다.');
 
-    return data as PostDetail;
+    return {
+      ...data,
+      profiles: data.profiles || null, // [0] 제거
+      comments:
+        data.comments?.map((comment: any) => ({
+          ...comment,
+          profiles: comment.profiles || null, // [0] 제거
+        })) || [],
+    } as PostDetail;
   } catch (error) {
     console.error('게시글 상세 조회 실패:', error);
     throw error;
