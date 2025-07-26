@@ -1,9 +1,7 @@
 import { TextField, Button } from '@/src/components';
 import styled from 'styled-components/native';
-import { useState } from 'react';
 import { TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
-import { createPost } from '@/src/lib/api';
-import { router } from 'expo-router';
+import { usePostWrite } from '@/src/hooks';
 
 const Container = styled.View`
   flex: 1;
@@ -24,47 +22,11 @@ const ContentContainer = styled.View`
 `;
 
 export default function WriteScreen() {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [loading, setLoading] = useState(false);
+  const { title, content, setTitle, setContent, handleSubmit, isSubmitting } =
+    usePostWrite();
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
-  };
-
-  const handleSubmit = async () => {
-    if (!title.trim()) {
-      Alert.alert('제목을 입력해주세요.');
-      return;
-    }
-
-    if (!content.trim()) {
-      Alert.alert('내용을 입력해주세요.');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      await createPost({
-        title: title.trim(),
-        content: content.trim(),
-      });
-
-      Alert.alert('성공', '게시글이 작성되었습니다.', [
-        {
-          text: '확인',
-          onPress: () => {
-            router.back();
-          },
-        },
-      ]);
-    } catch (error) {
-      console.error('게시글 작성 실패:', error);
-      Alert.alert('오류', '게시글 작성에 실패했습니다.');
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -90,10 +52,10 @@ export default function WriteScreen() {
         </ContentContainer>
 
         <Button
-          text={loading ? '작성 중...' : '작성 완료'}
+          text={isSubmitting ? '작성 중...' : '작성 완료'}
           onPress={handleSubmit}
           backgroundColor="blue"
-          disabled={loading}
+          disabled={isSubmitting}
         />
       </Container>
     </TouchableWithoutFeedback>

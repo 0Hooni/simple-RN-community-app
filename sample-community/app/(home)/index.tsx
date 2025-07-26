@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { RefreshControl } from 'react-native';
 import { PostPreView } from '@/src/components';
-import { fetchPosts } from '@/src/lib/api';
-import { PostListItem } from '@/src/lib/types';
+import { usePostList } from '@/src/hooks';
+import { formatSimpleDate } from '@/src/lib/dateUtils';
 import styled from 'styled-components/native';
 import { router } from 'expo-router';
 
@@ -23,49 +23,15 @@ const ErrorText = styled.Text`
 `;
 
 export default function Home() {
-  const [posts, setPosts] = useState<PostListItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: posts = [],
+    isLoading,
+    error,
+    refetch,
+    isRefetching,
+  } = usePostList();
 
-  useEffect(() => {
-    loadPosts();
-  }, []);
-
-  const loadPosts = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await fetchPosts();
-      setPosts(data);
-    } catch (err) {
-      setError('게시글을 불러오는데 실패했습니다.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const onRefresh = async () => {
-    try {
-      setRefreshing(true);
-      setError(null);
-      const data = await fetchPosts();
-      setPosts(data);
-    } catch (err) {
-      setError('게시글을 불러오는데 실패했습니다.');
-      console.error(err);
-    } finally {
-      setRefreshing(false);
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ko-KR');
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <Container>
         <LoadingText>게시글을 불러오는 중...</LoadingText>
@@ -77,10 +43,10 @@ export default function Home() {
     return (
       <Container
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
         }
       >
-        <ErrorText>{error}</ErrorText>
+        <ErrorText>게시글을 불러오는데 실패했습니다.</ErrorText>
       </Container>
     );
   }
@@ -88,7 +54,7 @@ export default function Home() {
   return (
     <Container
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
       }
     >
       {posts.map((post) => (
@@ -96,7 +62,7 @@ export default function Home() {
           key={post.id}
           title={post.title}
           writer={post.profiles?.nickname || '익명'}
-          timeStamp={formatDate(post.created_at)}
+          timeStamp={formatSimpleDate(post.created_at)}
           onPress={() => {
             router.push(`/${post.id}`);
           }}

@@ -3,8 +3,7 @@ import { TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
 import { TextField, Button } from '@/src/components';
 import { typography } from '@/src/styles';
 import { router } from 'expo-router';
-import { useState } from 'react';
-import { supabase } from '@/src/lib/supabase';
+import { useLoginForm } from '@/src/hooks';
 
 const Title = styled.Text`
   font-size: ${typography.title1.fontSize}px;
@@ -34,35 +33,8 @@ const ButtonContainer = styled.View`
 `;
 
 export default function Index() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleLogin = async () => {
-    if (!email.trim() || !password.trim()) {
-      Alert.alert('이메일과 비밀번호를 입력해주세요.');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        Alert.alert('로그인 실패', error.message);
-      } else {
-        router.replace('/(home)');
-      }
-    } catch (error) {
-      Alert.alert('로그인 실패', '알 수 없는 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { email, password, setEmail, setPassword, handleLogin, isLoading } =
+    useLoginForm();
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -86,10 +58,10 @@ export default function Index() {
         </TextFieldContainer>
         <ButtonContainer>
           <Button
-            text={loading ? '로그인 중...' : '로그인'}
+            text={isLoading ? '로그인 중...' : '로그인'}
             backgroundColor="blue"
             onPress={handleLogin}
-            disabled={loading}
+            disabled={isLoading}
           />
           <Button
             text="회원가입"
