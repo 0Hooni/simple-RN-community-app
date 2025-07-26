@@ -1,9 +1,8 @@
 import styled from 'styled-components/native';
 import { Comment, Post, SmallButton, TextField } from '@/src/components';
-import { useEffect, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
-import { PostDetail } from '@/src/lib/types';
-import { fetchPostDetail, createComment } from '@/src/lib/api';
+import { usePostDetail, useCreateComment, useCommentInput } from '@/src/hooks';
+import { formatDate, formatDateTime } from '@/src/lib/dateUtils';
 import {
   ActivityIndicator,
   Alert,
@@ -65,72 +64,12 @@ const LoadingContainer = styled.View`
 
 export default function PostDetailPage() {
   const { postId } = useLocalSearchParams<{ postId: string }>();
-  const [post, setPost] = useState<PostDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [comment, setComment] = useState('');
 
-  useEffect(() => {
-    loadPostDetail();
-  }, [postId]);
+  const { data: post, isLoading, error } = usePostDetail(postId);
+  const { comment, setComment, handleWriteComment, isSubmitting } =
+    useCommentInput(postId);
 
-  const loadPostDetail = async () => {
-    if (!postId) return;
-
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await fetchPostDetail(postId);
-      setPost(data);
-    } catch (error) {
-      setError('게시글을 불러오는데 실패했습니다.');
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
-  };
-
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ko-KR', {
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
-  const handleWriteComment = async () => {
-    if (!comment.trim()) {
-      Alert.alert('댓글을 입력해주세요.');
-      return;
-    }
-
-    if (!postId) return;
-
-    try {
-      await createComment({ post_id: postId, content: comment.trim() });
-
-      setComment('');
-
-      await loadPostDetail();
-
-      Alert.alert('성공', '댓글이 작성되었습니다.');
-    } catch (error) {
-      Alert.alert('실패', '댓글 작성에 실패했습니다.');
-    }
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <LoadingContainer>
         <ActivityIndicator size="large" color="black" />
@@ -139,7 +78,7 @@ export default function PostDetailPage() {
   }
 
   if (error) {
-    return <Text>{error}</Text>;
+    return <Text>게시글을 불러오는데 실패했습니다.</Text>;
   }
 
   return (
