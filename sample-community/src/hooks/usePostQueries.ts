@@ -1,7 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchPostDetail, createComment } from '../lib/api';
-import { CreateCommentRequest } from '../lib/types';
+import { fetchPosts, fetchPostDetail, createComment } from '@/src/lib/api';
+import { CreateCommentRequest } from '@/src/lib/types';
 import { Alert } from 'react-native';
+
+// 포스트 목록 조회
+export const usePostList = () => {
+  return useQuery({
+    queryKey: ['posts'],
+    queryFn: fetchPosts,
+    staleTime: 2 * 60 * 1000, // 2분
+  });
+};
 
 // 포스트 상세 조회
 export const usePostDetail = (postId: string | undefined) => {
