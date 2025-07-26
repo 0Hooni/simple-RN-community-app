@@ -31,12 +31,12 @@ export const useCommentInput = (postId: string | undefined) => {
         },
       },
     );
+  };
 
-    return {
-      comment,
-      setComment,
-      handleWriteComment,
-      isSubmitting: createCommentMutation.isPending,
-    };
+  return {
+    comment,
+    setComment,
+    handleWriteComment,
+    isSubmitting: createCommentMutation.isPending,
   };
 };
