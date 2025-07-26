@@ -16,3 +16,8 @@ export const formatDateTime = (dateString: string) => {
     minute: '2-digit',
   });
 };
+
+export const formatSimpleDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('ko-KR');
+};
